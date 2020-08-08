@@ -46,11 +46,14 @@ async def on_message(message):
         if (str(message.author.roles[1]) == 'Teacher'):
             print(discord.__version__)
             guild = message.guild
-            await guild.create_role(name="Group" + 1)
+            for x in range(1, int[args[2]] + 1):
+                print(x)
+                await guild.create_role(name="Group " + x)
             
 
         
             
 
 
-client.run(auth[])
+client.run(auth['discord_key'])
+
