@@ -1,9 +1,5 @@
 import discord
 import shlex
-import json
-
-with open('auth.json') as f:
-    auth = json.load(f)
 
 
 client = discord.Client()
@@ -47,10 +43,11 @@ async def on_message(message):
         if (str(message.author.roles[1]) == 'Teacher'):
             print(discord.__version__)
             guild = message.guild
-            await guild.create_role(name="Group")
+            await guild.create_role(name="Group" + 1)
+            
 
         
             
 
 
-client.run('NzE1MzQwMzA2MTQ4NjIyNDk2.Xs7ykw.GGSom3ANbnqucJTYtJfMR0772bE')
+client.run()
