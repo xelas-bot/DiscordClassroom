@@ -43,7 +43,7 @@ async def on_message(message):
         if (str(message.author.roles[1]) == 'Teacher'):
             print(discord.__version__)
             guild = message.guild
-            await guild.create_role(name="role name")
+            await guild.create_role(name="Group")
 
         
             
