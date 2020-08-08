@@ -1,6 +1,9 @@
 import discord
 import shlex
+import json
 
+with open('auth.json') as f:
+    auth = json.load(f)
 
 client = discord.Client()
 prefix = "!"
@@ -50,4 +53,4 @@ async def on_message(message):
             
 
 
-client.run()
+client.run(auth[])
