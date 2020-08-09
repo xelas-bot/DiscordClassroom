@@ -118,16 +118,39 @@ async def on_message(message):
                 await message.channel.send("Welcome " + message.author.name + ", you are a teacher.")
 
 
-    if True and command=='teams': #command to split students into groups with their own private channels
+    if command=='teams': #command to split students into groups with their own private channels
         if (message.author.roles[1].name == 'Teacher'):
             for x in range(int(args[0])):
                 await guild.create_role(name="Group " + str(x+1))
-            count = 1
+            count = 0
+            incr = 0
             students = len(users['students'])
+            pergroup = int(round(students / args[0]))
             for x in users['students']:
+                incr += 1
+
                 user = fetch_user(int(x))
-                role = discord.utils.get(guild.roles, name="Group " + str(count))
-                if (count/)
+
+                
+
+                role = discord.utils.get(guild.roles, name="Group " + str(count+1))
+                user.add_roles(role=role)
+
+
+                if (incr = pergroup):
+                    count += 1
+                    incr = 0
+                
+                
+
+               
+                
+
+                
+                
+
+               
+                
 
 
 
@@ -135,15 +158,5 @@ async def on_message(message):
 
 
                 pass
-    
-    if command == 'assign':
-        if(args[1] == 'all'):
-            for member in guild.members:
-                
-                for role in member.roles:
-                    if(role.name=='Student'):
-                        pass
-            
-
 
 client.run(auth['discord_key'])
