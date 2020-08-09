@@ -4,7 +4,7 @@ from discord.utils import get
 import shlex
 import json
 import numpy
-#import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 '''
 Utility Methods
@@ -128,7 +128,7 @@ async def summon(self, ctx: commands.context, *, channel: discord.VoiceChannel =
 async def leave(self, ctx: command.Context):
     if not ctx.voice_state.voice:
         return await ctx.send("Not in a channel")
-
+'''
 @commands.guild_only()
 @bot.command()
 async def start(ctx):
@@ -137,7 +137,22 @@ async def start(ctx):
     else:
         await ctx.send('Welcome %s, you are a student.' % ctx.message.author)
 
-'''
+
+
+@commands.guild_only()
+@bot.command()
+async def join_vc(ctx):
+    channel = ctx.author.voice.channel
+    await channel.connect()
+
+@commands.guild_only()
+@bot.command()
+async def leave_vc(ctx):
+    for v in bot.voice_clients:
+        if v.guild == ctx.guild:
+            await v.disconnect()
+
+
 @commands.guild_only()
 @bot.command()
 async def assign(ctx, role, *member):
