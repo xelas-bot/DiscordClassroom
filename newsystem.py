@@ -5,6 +5,8 @@ import shlex
 import json
 import numpy
 import matplotlib.pyplot as plt
+import asyncio
+import csv
 
 '''
 Utility Methods
@@ -69,7 +71,7 @@ async def on_guild_join(guild):
 @bot.event
 async def on_member_join(member):
     if config['auto_assign']:
-        await member.add_roles(get_role(member.guild, "Student"))
+        await member.add_roles(get_role(member.guild, config['auto_role']))
 
 @commands.guild_only()
 @bot.command()
@@ -78,10 +80,11 @@ async def ping(ctx):
 
 @commands.guild_only()
 @bot.command()
-async def teams(ctx, groups):
+async def teams(ctx, groups='help'):
     if has_role(ctx.author, 'Teacher'):
-
-        if groups == 'clear':
+        if groups.lower() == 'help':
+            await ctx.send('Use clear lol')
+        elif groups.lower() == 'clear':
             for x in ctx.guild.roles:
                 if "Group" in x.name :
                     await x.delete()
@@ -92,43 +95,70 @@ async def teams(ctx, groups):
                     for y in x.voice_channels:
                         await y.delete()
                     await x.delete()
-
         else:
-            roles = []
-            for x in range(int(groups)):
-                roles.append(await ctx.guild.create_role(name="Group " + str(x+1), hoist=True))
-                overwrites = {ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False), roles[x]:discord.PermissionOverwrite(read_messages=True)}
-                category = await ctx.guild.create_category("Group " + str(x+1), overwrites=overwrites, position=(x+1))
-                await category.create_text_channel("Group " + str(x+1))
-                await category.create_voice_channel("Group " + str(x+1))
-            
-            incr = 0
-            students = len(users['students'])
-            while incr <= students:
-                user = get_member(ctx.guild, users['students'][incr])
-                role = roles[incr % int(groups)]
-                await user.add_roles(role)
-                incr += 1
+            if any('Group' in x.name for x in ctx.guild.roles):
+                ctx.send('Teams have already been distributed! Use `!teams clear` to remove old teams!')
+            else:
+                roles = []
+                for x in range(int(groups)):
+                    roles.append(await ctx.guild.create_role(name="Group " + str(x+1), hoist=True))
+                    overwrites = {ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False), roles[x]:discord.PermissionOverwrite(read_messages=True)}
+                    category = await ctx.guild.create_category("Group " + str(x+1), overwrites=overwrites, position=(x+1))
+                    await category.create_text_channel("Group " + str(x+1))
+                    await category.create_voice_channel("Group " + str(x+1))
+                
+                incr = 0
+                students = len(users['students'])
+                while incr <= students:
+                    user = get_member(ctx.guild, users['students'][incr])
+                    role = roles[incr % int(groups)]
+                    await user.add_roles(role)
+                    incr += 1
+@commands.guild_only()
+@bot.command()
+async def display(ctx, args):
+    with open('Test.csv') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter=',')
+        print(csv_reader)
+        bottomTitle = list(csv_reader)
+        
 
-'''
-@bot.command(name = 'summon')
-@commands.has_permissions(manage_guild = True)
-async def summon(self, ctx: commands.context, *, channel: discord.VoiceChannel = None):
-    if not channel and not ctx.author.voice:
-            raise VoiceError('You are not in a channel')
-    destination = channel or ctx.author.voice.channel
-    if ctx.voice_state.voice:
-        await ctx.voice_state.voice.move_to(destination)
-        return
-    ctx.voice_state.voice = await destination.connect()
+                    
+        
+        
+            
+
+    
+    plt.figure(figsize=(10, 5), facecolor='grey')
+    plt.title("Example Bar Graph")
+    courses = bottomTitle[0][1:]
+    values = [1,2,3,4,5,6,7,8]
+   
+    fig = plt.figure(figsize = (10, 5)) 
+    print(courses)
+    print(values)
+    
+    # creating the bar plot 
+    plt.bar(courses, values, color ='maroon',  
+        width = 0.4) 
+  
+    plt.xlabel("Courses offered") 
+    plt.ylabel("No. of students enrolled") 
+    plt.title("Students enrolled in different courses")
+
+    plt.savefig("./my_img.png", facecolor='grey')
+    chart = discord.Embed(title="Graph", colour=discord.Colour(0x592f52),)
+
+    file = discord.File("./my_img.png")
+    chart = discord.Embed()
+    chart.set_image(url="attachment://my_img.png")
+
+    await ctx.send(file=file, embed=chart)
     
 
-@bot.command(name = 'leave', aliases=['disconnect'])
-@commands.has_permissions(manage_guild=True)
-async def leave(self, ctx: command.Context):
-    if not ctx.voice_state.voice:
-        return await ctx.send("Not in a channel")
-'''
+
+    await ctx.send("Uranobese")
+
 @commands.guild_only()
 @bot.command()
 async def start(ctx):
@@ -174,5 +204,34 @@ async def show_graph(ctx):
     if attachment[0].url.endswith('csv'):
         print('CSV found')
     pass
+
+@commands.guild_only()
+@bot.command()
+async def attendance(ctx):
+    attendance_msg = await  ctx.channel.send("%s Check in for attendance" % get_role(ctx.guild, 'Student').mention)
+    await attendance_msg.add_reaction('✅')
+    await asyncio.sleep(4)
+    attendance_msg = await attendance_msg.channel.fetch_message(attendance_msg.id)
+    here_m = ''
+    here = set([])
+    for reaction in attendance_msg.reactions:
+        reaction = await reaction.users().flatten()
+        for user in reaction:
+            if not user.bot and has_role(user, 'Student'):
+                here.add(user.id)
+                here_m += user.display_name + '\n'
+    absent = set([])
+    absent_m = ''
+    students = []
+    for x in ctx.guild.members:
+        if has_role(x, 'Student'):
+            students.append(x.id)
+    for student in students:
+        if not student in here:
+            absent.add(student)
+            absent_m += get_member(ctx.guild, student).display_name + '\n'
+
+    await ctx.channel.send('Present:' + here_m)
+    await ctx.channel.send('Absent:' + absent_m)
 
 bot.run(auth['discord_key'])

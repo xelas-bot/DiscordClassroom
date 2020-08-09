@@ -1,4 +1,5 @@
 {
     "prefix":"!",
-    "auto_assign": true
+    "auto_assign": true,
+    "auto_role": "Student"
 }
