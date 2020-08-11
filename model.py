@@ -1,6 +1,11 @@
 import speech_recognition as sr 
 import pyttsx3 
 
+#pip install speechrecognition
+#pip install pipwin
+#pipwin install pynacl
+#pip install --upgrade google-cloud-speech <- google ftw
+
 def main():
     r = sr.Recognizer()
     with sr.Microphone() as source:
