@@ -5,7 +5,7 @@ from threading import Thread
 import opus_api
 
 # bot token and wit.ai api key
-TOKEN = "NzE1MzQwMzA2MTQ4NjIyNDk2.Xs7ykw.jlQiT_Wkt-9O0866LN1vuuUHMHQ"
+TOKEN = "NzE1MzQwMzA2MTQ4NjIyNDk2.Xs7ykw.iWP7kulXFeucnqp9r4BvWFAEs80"
 WIT_AI_KEY = "Y5G6WVVDSHKIHSTFQUXDW6QBLGGPMQDU"
 
 
