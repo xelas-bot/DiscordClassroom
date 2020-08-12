@@ -116,48 +116,53 @@ async def teams(ctx, groups='help'):
                     incr += 1
 @commands.guild_only()
 @bot.command()
-async def display(ctx, args):
-    with open('Test.csv') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter=',')
-        print(csv_reader)
-        bottomTitle = list(csv_reader)
-        
-
-                    
-        
-        
-            
-
-    
-    plt.figure(figsize=(10, 5), facecolor='grey')
-    plt.title("Example Bar Graph")
-    courses = bottomTitle[0][1:]
-    values = [1,2,3,4,5,6,7,8]
-   
-    fig = plt.figure(figsize = (10, 5)) 
-    print(courses)
-    print(values)
-    
-    # creating the bar plot 
-    plt.bar(courses, values, color ='maroon',  
-        width = 0.4) 
-  
-    plt.xlabel("Courses offered") 
-    plt.ylabel("No. of students enrolled") 
-    plt.title("Students enrolled in different courses")
-
-    plt.savefig("./my_img.png", facecolor='grey')
-    chart = discord.Embed(title="Graph", colour=discord.Colour(0x592f52),)
-
-    file = discord.File("./my_img.png")
-    chart = discord.Embed()
-    chart.set_image(url="attachment://my_img.png")
-
-    await ctx.send(file=file, embed=chart)
+async def display(ctx, args="str"):
     
 
+    if args == args:
+        with open('Test.csv') as csv_file:
+            csv_reader = csv.reader(csv_file, delimiter=',')
+            print(csv_reader)
+            bottomTitle = list(csv_reader)
 
-    await ctx.send("Uranobese")
+        courses = bottomTitle[0][1:]
+        key = bottomTitle[1][1:]
+        DataList = bottomTitle[2:]
+        Qnum = 0
+        values = []
+        for x in courses:
+            values.append(0)
+
+        for x in DataList:
+            Qnum = 0
+            for y in x[1:]:
+                if y == key[Qnum]:
+                    values[Qnum] += 1 
+                Qnum  += 1
+
+        print(values)
+
+        plt.figure(figsize=(20, 10), facecolor='grey')
+        plt.title("Most Missed Questions")
+
+        # creating the bar plot 
+        plt.bar(courses, values, color ='maroon',  
+            width = 0.4) 
+
+        plt.xlabel("Question Number") 
+        plt.ylabel("Number of Students who Missed the Question") 
+
+
+        plt.savefig("./my_img.png", facecolor='grey')
+        chart = discord.Embed(title="Graph", colour=discord.Colour(0x592f52),)
+
+        file = discord.File("./my_img.png")
+        chart = discord.Embed()
+        chart.set_image(url="attachment://my_img.png")
+
+        await ctx.send(file=file, embed=chart)
+    else:
+        await ctx.send("Please specify what you want to display")
 
 @commands.guild_only()
 @bot.command()
