@@ -3,7 +3,7 @@ import asyncio
 import speech_recognition as sr
 from threading import Thread
 import opus_api
-
+import pyogg
 # bot token and wit.ai api key
 TOKEN = "NzE1MzQwMzA2MTQ4NjIyNDk2.Xs7ykw.iWP7kulXFeucnqp9r4BvWFAEs80"
 WIT_AI_KEY = "Y5G6WVVDSHKIHSTFQUXDW6QBLGGPMQDU"
