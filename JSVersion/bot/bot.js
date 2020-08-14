@@ -5,6 +5,211 @@ const Discord = require('discord.js');
 // Init APIs
 const bot = new Discord.Client();
 const csv = require('csvtojson')
+var plotly = require('plotly')("shreyp941", "EVB3wx9ilEippMEXHPne")
+var fs = require('fs');
+
+
+
+function myData(filepath, name) {
+    const csvFilePath = filepath
+
+
+    if (filepath == "Test.csv") {
+
+        dataset = [0, 0, 0, 0, 0, 0, 0, 0]
+        var arr;
+        csv()
+            .fromFile(csvFilePath)
+            .then((jsonObj) => {
+                var keys = [];
+                var table = jsonObj.slice(1, jsonObj.length)
+                var testObj = jsonObj[0]
+
+                values = []
+
+                var x
+                for (x in testObj) {
+
+                    keys.push(testObj[x])
+                }
+                keys = keys.slice(0, keys.length - 1)
+
+                for (x in testObj) {
+                    values.push(x)
+                }
+                values = values.slice(0, values.length - 1)
+                //console.log(table)
+                var y
+                var qnum = 0
+
+
+                for (x in table) {
+                    var qnum = 0
+                    //console.log(table[x])
+
+                    for (y in table[x]) {
+                        delete table[x].Names
+                        //console.log(table[x][qnum+1])
+                        if (table[x][qnum + 1] != keys[qnum]) {
+                            dataset[qnum] += 1;
+                        }
+                        qnum += 1
+                    }
+                }
+
+                console.log(dataset)
+                var newValues = values.map(Number)
+                console.log(newValues)
+
+
+                var trace1 = {
+                    x: newValues,
+                    y: dataset,
+                    name: "Questions Missed",
+                    type: "bar"
+                };
+
+                var layout = {
+                    title: "Questions Missed on Recent Exam",
+                    xaxis: {
+                        title: "Question Number",
+                        titlefont: {
+                            family: "Courier New, monospace",
+                            size: 10,
+                            color: "#7f7f7f"
+                        }
+                    },
+                    yaxis: {
+                        title: "Amount of Students who Missed the Question",
+                        titlefont: {
+                            family: "Courier New, monospace",
+                            size: 10,
+                            color: "#7f7f7f"
+                        }
+                    }
+                };
+
+                var figure = { 'data': [trace1], layout: layout };
+
+                var imgOpts = {
+                    format: 'png',
+                    width: 1000,
+                    height: 500
+                };
+
+                plotly.getImage(figure, imgOpts, function (error, imageStream) {
+                    if (error) return console.log(error);
+
+                    var fileStream = fs.createWriteStream('temp_graph.png');
+                    imageStream.pipe(fileStream);
+                });
+
+
+            })
+    } else {
+        user = name
+        var name;
+        csv()
+            .fromFile(csvFilePath)
+            .then((jsonObj) => {
+                console.log(jsonObj);
+
+                bulk = jsonObj
+                Studentnames = []
+                units = []
+                dataset = []
+                tempObj = {}
+
+
+                for (x in bulk) {
+                    Studentnames.push(bulk[x]["field1"])
+                }
+                console.log(Studentnames)
+
+                for (x in bulk[0]) {
+                    units.push(x)
+                }
+                units = units.slice(1, units.length)
+                console.log(units)
+
+
+
+
+
+                for (x in bulk) {
+                    if (bulk[x]["field1"] == user) {
+                        name = bulk[x]['field1']
+                        for (y in bulk[x]) {
+                            dataset.push(bulk[x][y])
+                        }
+                    }
+                }
+                dataset = dataset.slice(1, dataset.length)
+                dataset = dataset.map(Number)
+                console.log(dataset)
+
+
+                var trace1 = {
+                    x: units,
+                    y: dataset,
+                    type: "line"
+                };
+                var layout = {
+                    title: "Score Progress for " + name,
+                    xaxis: {
+                        title: "Unit Number",
+                        titlefont: {
+                            family: "Courier New, monospace",
+                            size: 10,
+                            color: "#7f7f7f"
+                        }
+                    },
+                    yaxis: {
+                        title: "Unit Test Score",
+                        titlefont: {
+                            family: "Courier New, monospace",
+                            size: 10,
+                            color: "#7f7f7f"
+                        }
+                    }
+                };
+
+                var figure = { 'data': [trace1], layout: layout };
+
+                var imgOpts = {
+                    format: 'png',
+                    width: 1000,
+                    height: 500
+                };
+
+                plotly.getImage(figure, imgOpts, function (error, imageStream) {
+                    if (error) return console.log(error);
+
+                    var fileStream = fs.createWriteStream('temp_graph.png');
+                    imageStream.pipe(fileStream);
+                });
+
+            })
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -166,108 +371,23 @@ bot.on('message', async message => {
                 break;
 
             case 'display':
-                message.channel.send("Test" + args)
                 
+                const csvFilePath = 'unit progress.csv'
+
+
 
                 if (args[1] == "recent_test") {
+                    myData('Test.csv')
+                    setTimeout(() => {  message.channel.send("Data for most recent test", { files: ["temp_graph.png"] }); }, 1000);
                     
 
-                    var plotly = require('plotly')("shreyp941", "EVB3wx9ilEippMEXHPne")
-                    var fs = require('fs');
-                    //const { values } = require('d3-collection');
-                    dataset = [0, 0, 0, 0, 0, 0, 0, 0]
-                    var arr;
-                    csv()
-                        .fromFile('/Test.csv')
-                        .then((jsonObj) => {
-                            var keys = [];
-                            var table = jsonObj.slice(1, jsonObj.length)
-                            var testObj = jsonObj[0]
 
-                            values = []
-
-                            var x
-                            for (x in testObj) {
-
-                                keys.push(testObj[x])
-                            }
-                            keys = keys.slice(0, keys.length - 1)
-
-                            for (x in testObj) {
-                                values.push(x)
-                            }
-                            values = values.slice(0, values.length - 1)
-                            //console.log(table)
-                            var y
-                            var qnum = 0
-
-
-                            for (x in table) {
-                                var qnum = 0
-                                //console.log(table[x])
-
-                                for (y in table[x]) {
-                                    delete table[x].Names
-                                    //console.log(table[x][qnum+1])
-                                    if (table[x][qnum + 1] != keys[qnum]) {
-                                        dataset[qnum] += 1;
-                                    }
-                                    qnum += 1
-                                }
-                            }
-
-                            console.log(dataset)
-                            var newValues = values.map(Number)
-                            console.log(newValues)
-
-
-                            var trace1 = {
-                                x: newValues,
-                                y: dataset,
-                                name: "Questions Missed",
-                                type: "bar"
-                            };
-
-                            var layout = {
-                                title: "Questions Missed on Recent Exam",
-                                xaxis: {
-                                    title: "Question Number",
-                                    titlefont: {
-                                        family: "Courier New, monospace",
-                                        size: 10,
-                                        color: "#7f7f7f"
-                                    }
-                                },
-                                yaxis: {
-                                    title: "Amount of Students who Missed the Question",
-                                    titlefont: {
-                                        family: "Courier New, monospace",
-                                        size: 10,
-                                        color: "#7f7f7f"
-                                    }
-                                }
-                            };
-
-                            var figure = { 'data': [trace1], layout: layout };
-
-                            var imgOpts = {
-                                format: 'png',
-                                width: 1000,
-                                height: 500
-                            };
-
-                            plotly.getImage(figure, imgOpts, function (error, imageStream) {
-                                if (error) return console.log(error);
-
-                                var fileStream = fs.createWriteStream('temp_graph.png');
-                                imageStream.pipe(fileStream);
-                            });
-
-
-                        })
 
                 } else if (args[1] == "unit_scores") {
-                    console.log("buruh")
+
+                    myData('unit progress.csv', args[2])
+                    setTimeout(() => { message.channel.send("Displaying data for " + args[2], { files: ["temp_graph.png"] });  }, 1000);
+                    
                 }
 
 
@@ -434,4 +554,4 @@ bot.on('voiceStateUpdate', async (oldMember, newMember) => {
             return channels.splice(i, 1);
         }
     }
-});
+})

@@ -1,74 +1,20 @@
 
-
-
-
-
 const csvFilePath='Test.csv'
-const csv=require('csvtojson')
 
 var plotly = require('plotly')("shreyp941", "EVB3wx9ilEippMEXHPne")
 var fs = require('fs');
 //const { values } = require('d3-collection');
-
 dataset= [0,0,0,0,0,0,0,0]
 var arr;
-
-
-
-
-
-
-
-
 csv()
 .fromFile(csvFilePath)
 .then((jsonObj)=>{
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     var keys = [];
     var table = jsonObj.slice(1,jsonObj.length)
     var testObj = jsonObj[0]
     
     values = []
     
-
-
     var x
     for (x in testObj){
         
@@ -76,7 +22,6 @@ csv()
     }
     keys = keys.slice(0,keys.length-1)
     
-
     for (x in testObj){
         values.push(x)
     }
@@ -85,9 +30,7 @@ csv()
     var y
     var qnum = 0
     
-
     
-
     for (x in table){
         var qnum = 0
         //console.log(table[x])
@@ -95,25 +38,16 @@ csv()
         for (y in table[x]){
             delete table[x].Names
             //console.log(table[x][qnum+1])
-
             if (table[x][qnum+1] != keys[qnum]){
                 dataset[qnum] += 1;
             }
-
             qnum +=1
-
-
         }
-
     }
     
     console.log(dataset)
-
-
     var newValues = values.map(Number)
     console.log(newValues)
-
-
    
     
     var trace1 = {
@@ -142,8 +76,6 @@ csv()
           }
         }
       };
-
-
     
     var figure = { 'data': [trace1], layout:layout };
     
@@ -161,12 +93,5 @@ csv()
     });
     
     
-
-
-
 })
  
-
-
-
-
