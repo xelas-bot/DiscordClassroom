@@ -11,15 +11,20 @@ import csv
 '''
 Utility Methods
 '''
+
+
 def read(filename):
     with open(filename) as f:
         data = json.load(f)
         f.close()
         return data
+
+
 def write(data, filename):
     with open(filename, 'w') as f:
         json.dump(data, f)
         f.close()
+
 
 '''
 Bot Necessities
@@ -33,14 +38,23 @@ bot = commands.Bot(command_prefix=config['prefix'], case_insensitive=True)
 
 def has_role(user, role):
     return any(r.name == role for r in user.roles)
+
+
 def get_role(guild, name):
     return discord.utils.get(guild.roles, name=name)
+
+
 def id_to_ping(id):
     return '<@!' + str(id) + '>'
+
+
 def ping_to_id(ping):
     return ping[3:-1]
+
+
 def get_member(guild, id):
     return guild.get_member(int(id))
+
 
 @bot.event
 async def on_ready():
@@ -57,26 +71,29 @@ async def on_guild_join(guild):
         if not any(x.name == 'Student' for x in guild.roles):
             await guild.create_role(name='Student', colour=discord.Colour(0xffffff))
     except Exception:
-        guild.owner.send("The bot does not have permissions to create/edit roles")
-        
-        
+        guild.owner.send(
+            "The bot does not have permissions to create/edit roles")
+
     if (guild.owner.id not in users['teachers']):
-            users['teachers'].append(guild.owner.id)
-            write(users, 'users.json')
-                
+        users['teachers'].append(guild.owner.id)
+        write(users, 'users.json')
+
     role = discord.utils.get(guild.roles, name="Teacher")
-    
+
     await guild.owner.add_roles(role)
+
 
 @bot.event
 async def on_member_join(member):
     if config['auto_assign']:
         await member.add_roles(get_role(member.guild, config['auto_role']))
 
+
 @commands.guild_only()
 @bot.command()
 async def ping(ctx):
     await ctx.send('pong')
+
 
 @commands.guild_only()
 @bot.command()
@@ -86,10 +103,10 @@ async def teams(ctx, groups='help'):
             await ctx.send('Use clear lol')
         elif groups.lower() == 'clear':
             for x in ctx.guild.roles:
-                if "Group" in x.name :
+                if "Group" in x.name:
                     await x.delete()
             for x in ctx.guild.categories:
-                if 'Group' in x.name :
+                if 'Group' in x.name:
                     for y in x.text_channels:
                         await y.delete()
                     for y in x.voice_channels:
@@ -97,16 +114,18 @@ async def teams(ctx, groups='help'):
                     await x.delete()
         else:
             if any('Group' in x.name for x in ctx.guild.roles):
-                ctx.send('Teams have already been distributed! Use `!teams clear` to remove old teams!')
+                ctx.send(
+                    'Teams have already been distributed! Use `!teams clear` to remove old teams!')
             else:
                 roles = []
                 for x in range(int(groups)):
                     roles.append(await ctx.guild.create_role(name="Group " + str(x+1), hoist=True))
-                    overwrites = {ctx.guild.default_role: discord.PermissionOverwrite(read_messages=False), roles[x]:discord.PermissionOverwrite(read_messages=True)}
+                    overwrites = {ctx.guild.default_role: discord.PermissionOverwrite(
+                        read_messages=False), roles[x]: discord.PermissionOverwrite(read_messages=True)}
                     category = await ctx.guild.create_category("Group " + str(x+1), overwrites=overwrites, position=(x+1))
                     await category.create_text_channel("Group " + str(x+1))
                     await category.create_voice_channel("Group " + str(x+1))
-                
+
                 incr = 0
                 students = len(users['students'])
                 while incr <= students:
@@ -114,55 +133,99 @@ async def teams(ctx, groups='help'):
                     role = roles[incr % int(groups)]
                     await user.add_roles(role)
                     incr += 1
+
+
 @commands.guild_only()
 @bot.command()
-async def display(ctx, args="str"):
+async def display(ctx, args, name="Unknown"):
+
+    if (ctx.message.author.guild_permissions.administrator):
     
 
-    if args == args:
-        with open('Test.csv') as csv_file:
-            csv_reader = csv.reader(csv_file, delimiter=',')
-            print(csv_reader)
-            bottomTitle = list(csv_reader)
+        if args == "recent_test":
+            with open('Test.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+                print(csv_reader)
+                bottomTitle = list(csv_reader)
 
-        courses = bottomTitle[0][1:]
-        key = bottomTitle[1][1:]
-        DataList = bottomTitle[2:]
-        Qnum = 0
-        values = []
-        for x in courses:
-            values.append(0)
-
-        for x in DataList:
+            courses = bottomTitle[0][1:]
+            key = bottomTitle[1][1:]
+            DataList = bottomTitle[2:]
             Qnum = 0
-            for y in x[1:]:
-                if y == key[Qnum]:
-                    values[Qnum] += 1 
-                Qnum  += 1
+            values = []
+            for x in courses:
+                values.append(0)
 
-        print(values)
+            for x in DataList:
+                Qnum = 0
+                for y in x[1:]:
+                    if not y == key[Qnum]:
+                        values[Qnum] += 1
+                    Qnum += 1
 
-        plt.figure(figsize=(20, 10), facecolor='grey')
-        plt.title("Most Missed Questions")
+            print(values)
 
-        # creating the bar plot 
-        plt.bar(courses, values, color ='maroon',  
-            width = 0.4) 
+            plt.figure(figsize=(20, 10), facecolor='grey')
+            plt.title("Most Missed Questions")
 
-        plt.xlabel("Question Number") 
-        plt.ylabel("Number of Students who Missed the Question") 
+            # creating the bar plot
+            plt.bar(courses, values, color='maroon',
+                    width=0.4)
 
+            plt.xlabel("Question Number")
+            plt.ylabel("Number of Students who Missed the Question")
 
-        plt.savefig("./my_img.png", facecolor='grey')
-        chart = discord.Embed(title="Graph", colour=discord.Colour(0x592f52),)
+            plt.savefig("./my_img.png", facecolor='grey')
+            chart = discord.Embed(title="Graph", colour=discord.Colour(0x592f52),)
 
-        file = discord.File("./my_img.png")
-        chart = discord.Embed()
-        chart.set_image(url="attachment://my_img.png")
+            file = discord.File("./my_img.png")
+            chart = discord.Embed()
+            chart.set_image(url="attachment://my_img.png")
 
-        await ctx.send(file=file, embed=chart)
+            await ctx.send(file=file, embed=chart)
+        elif (args == "unit_scores"):
+            user = name
+            with open('unitprogress.csv') as csv_file:
+                csv_reader = csv.reader(csv_file, delimiter=',')
+
+                bulk = list(csv_reader)
+            print(bulk)
+            units = bulk[0]
+            units = units[1:len(units)]
+            scores = []
+
+            for x in bulk:
+                if (x[0].lower() == user.lower()):
+                    disName = x[0]
+                    for y in x:
+                        scores.append(y)
+
+            scores = scores[1:len(scores)]
+            print(scores)
+            scores = list(map(int,scores))
+
+            plt.figure(figsize=(20, 10), facecolor='grey')
+            plt.title("Unit Progress for " + disName, fontsize = 24)
+
+            # creating the bar plot
+            plt.plot(units, scores)
+            plt.xlabel("Score", fontsize=18)
+            plt.ylabel("Unit Number", fontsize = 18)
+
+            plt.savefig("./my_img.png", facecolor='grey')
+            chart = discord.Embed(title="Graph", colour=discord.Colour(0x592f52),)
+
+            file = discord.File("./my_img.png")
+            chart = discord.Embed()
+            chart.set_image(url="attachment://my_img.png")
+            await ctx.send(file=file, embed=chart)
+
+        else:
+            await ctx.send("Please specify what you want to display")
+
     else:
-        await ctx.send("Please specify what you want to display")
+        await ctx.send("You do not have privileges to display grades")
+
 
 @commands.guild_only()
 @bot.command()
@@ -173,12 +236,12 @@ async def start(ctx):
         await ctx.send('Welcome %s, you are a student.' % ctx.message.author)
 
 
-
 @commands.guild_only()
 @bot.command()
 async def join_vc(ctx):
     channel = ctx.author.voice.channel
     await channel.connect()
+
 
 @commands.guild_only()
 @bot.command()
@@ -191,16 +254,17 @@ async def leave_vc(ctx):
 @commands.guild_only()
 @bot.command()
 async def assign(ctx, role, *member):
-    if(len(member)>0):
+    if(len(member) > 0):
         if(member[0].lower() == 'all'):
             for user in ctx.guild.members:
                 if not has_role(user, role) and not has_role(user, 'Teacher') and not user.bot:
                     await user.add_roles(get_role(ctx.guild, role))
         else:
             for m in member:
-                m = get_member(ctx.guild,ping_to_id(m))
+                m = get_member(ctx.guild, ping_to_id(m))
                 if not has_role(m, role):
                     await m.add_roles(get_role(ctx.guild, role))
+
 
 @bot.command()
 async def show_graph(ctx):
@@ -210,12 +274,13 @@ async def show_graph(ctx):
         print('CSV found')
     pass
 
+
 @commands.guild_only()
 @bot.command()
 async def attendance(ctx):
-    attendance_msg = await  ctx.channel.send("%s Check in for attendance" % get_role(ctx.guild, 'Student').mention)
+    attendance_msg = await ctx.channel.send("%s Check in for attendance" % get_role(ctx.guild, 'Student').mention)
     await attendance_msg.add_reaction('✅')
-    await asyncio.sleep(4)
+    await asyncio.sleep(15)
     attendance_msg = await attendance_msg.channel.fetch_message(attendance_msg.id)
     here_m = ''
     here = set([])

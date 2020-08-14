@@ -10,7 +10,7 @@ var fs = require('fs');
 
 
 
-function myData(filepath, name) {
+function myData(filepath, name ='') {
     const csvFilePath = filepath
 
 
@@ -108,7 +108,8 @@ function myData(filepath, name) {
             })
     } else {
         user = name
-        var name;
+        userDis = user
+        var name
         csv()
             .fromFile(csvFilePath)
             .then((jsonObj) => {
@@ -137,8 +138,9 @@ function myData(filepath, name) {
 
 
                 for (x in bulk) {
-                    if (bulk[x]["field1"] == user) {
-                        name = bulk[x]['field1']
+                    if (bulk[x]["field1"].toLowerCase() == user.toLowerCase()) {
+                        name == bulk[x]['field1']
+                        userDis = bulk[x]['field1']
                         for (y in bulk[x]) {
                             dataset.push(bulk[x][y])
                         }
@@ -155,7 +157,7 @@ function myData(filepath, name) {
                     type: "line"
                 };
                 var layout = {
-                    title: "Score Progress for " + name,
+                    title: "Score Progress for " + userDis,
                     xaxis: {
                         title: "Unit Number",
                         titlefont: {
