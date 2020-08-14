@@ -1,0 +1,15 @@
+{
+	"name": "newbot",
+	"version": "0.0.1",
+	"description": "Test Discord bot",
+	"main": "bot.js",
+	"author": "cc",
+	"dependencies": {
+		"alphavantage": "^2.0.1",
+		"discord.js": "^11.6.2",
+		"googleapis": "^48.0.0",
+		"node-fetch": "^2.6.0",
+		"simple-youtube-api": "^5.2.1",
+		"ytdl-core": "^2.0.0"
+	}
+}
