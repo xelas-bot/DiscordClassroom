@@ -372,7 +372,7 @@ bot.on('message', async message => {
 
             case 'display':
                 
-                const csvFilePath = 'unit progress.csv'
+                
 
 
 
